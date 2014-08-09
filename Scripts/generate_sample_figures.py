@@ -22,7 +22,7 @@ def checkInputs(inputs,y1,y2):
 
 	 
 #load word frequencies
-WP = pickle.load(open('/Users/jschwarz/Code/Python/Projects/Processed data/Pubmed/WordFreq','r'))
+WP = pickle.load(open('../../Processed data/Pubmed/WordFreq','r'))
 WP_index = WP.index
 WP_years = WP.columns
 
@@ -38,4 +38,4 @@ ax = fig.add_subplot(111)
 ax.plot(WP.ix[ind,y1:y2].T*100) #plot the subset of the data
 ax.xlabel('Year')
 ax.ylabel('Percent of title words')
-ax.savefig('/Users/jschwarz/Code/Python/Projects/Pubmed_analysis/' + inputs[0] + '.eps')
+ax.savefig('../Figures/' + inputs[0] + '.eps')

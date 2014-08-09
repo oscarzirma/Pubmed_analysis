@@ -18,7 +18,7 @@ if __name__ == "__main__":
    	inputs = sys.argv[3:] #words to query
    	     
 	#load word frequencies
-	WP = pickle.load(open('/Users/jschwarz/Code/Python/Projects/Processed data/Pubmed/WordFreq','r'))
+	WP = pickle.load(open('../../Processed data/Pubmed/WordFreq','r'))
 	WP_index = WP.index
 	WP_years = WP.columns
 
@@ -34,4 +34,4 @@ if __name__ == "__main__":
 	fig = (WP.ix[ind,y1:y2].T*100).plot() #plot the subset of the data
 	plt.xlabel('Year')
 	plt.ylabel('Percent of title words')
-	plt.savefig('/Users/jschwarz/Code/Python/Projects/Pubmed_analysis/' + inputs[0] + '.eps')
+	plt.savefig('../Figures/' + inputs[0] + '.eps')

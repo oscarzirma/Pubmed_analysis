@@ -13,8 +13,9 @@ end_year =  1940 #last year from which to pull medline entries (inclusive)
 
 data_directory = '../../Data/Pubmed/medline/'
 
+Entrez.email = "EMAIL" #email for entrez tracking
+
 batch_size = 2000;#record to pull in each iteration
-Entrez.email = "schwarzj@stanford.edu" #email for entre tracking
 #non_year_search_term = "(Smith[AUTH]) AND (" #search term preceding the year (example)
 non_year_search_term = "" #for this data set, we only use the year
 

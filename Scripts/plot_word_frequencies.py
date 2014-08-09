@@ -18,7 +18,7 @@ if __name__ == "__main__":
    	inputs = sys.argv[3:] #words to query
    	     
 	#load word frequencies
-	WP = pickle.load(open('/Users/jschwarz/Code/Python/Projects/Processed data/Pubmed/WordFreq','r'))
+	WP = pickle.load(open('../../Processed data/Pubmed/WordFreq','r'))
 	WP_index = WP.index
 	WP_years = WP.columns
 
