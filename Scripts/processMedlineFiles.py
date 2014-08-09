@@ -63,6 +63,7 @@ def getMedlineTitleWord(text_file):
 
 
 data_directory = '../../Data/Pubmed/medline/' #Folder containing medline data files in .txt format
+processed_data = '../../Processed data/Pubmed/' #location to save processed data
 
 file_list = listdir(data_directory) #get list of all files in data_directory
 
@@ -77,19 +78,9 @@ for f in file_list:
 		word_dict[f[-9:-4]] = word_freq #add word frequencies from current file to word_dict keyed to subset of current file name
 		bigram_dict[f[-9:-4]] = bigram_freq #add bigram frequencies from current file to word_dict keyed to subset of current file name
 		print(word_dict.keys()) #list all of the current keys
-		output_file = open(data_directory+'/words'+f[-9:-4],'w')
+		output_file = open(processed_data+'/words'+f[-9:-4],'w')
 		pickle.dump(word_freq,output_file)
 		output_file.close()
-#		output_file = open(data_directory+'/bigrams'+f[-9:-4],'w')
-#		pickle.dump(bigram_freq,output_file)
-#		output_file.close()		
-"""
-WordFreq = pd.DataFrame.from_dict(word_dict) #generate data frame from word frequency dict
-BigramFreq = pd.DataFrame.from_dict(bigram_dict) #generate data frame from bigram frequency dict
-
-WordFreq.fillna(0,inplace=True) #replace NaN with 0
-WordFreq.to_pickle(data_directory + 'WordFreq_pickle') #save dataframe in pickle format
-
-BigramFreq.fillna(0,inplace=True) #replace NaN with 0
-"""
-BigramFreq.to_pickle(data_directory + 'BigramFreq_pickle') #save dataframe in pickle format
+		output_file = open(processed_data+'/bigrams'+f[-9:-4],'w')
+		pickle.dump(bigram_freq,output_file)
+		output_file.close()		
