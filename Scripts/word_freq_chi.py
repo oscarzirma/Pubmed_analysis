@@ -5,6 +5,10 @@ by squaring the difference between expected and observed and dividing it by expe
 for each word in each year
 """
 
+import pandas as pd
+import pickle
+import numpy as np
+
 WF = pickle.load(open('/Users/jschwarz/Code/Python/Projects/Processed data/Pubmed/WordFreq','r'))
 WP = pickle.load(open('/Users/jschwarz/Code/Python/Projects/Processed data/Pubmed/WordProp','r'))
 

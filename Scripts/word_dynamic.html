@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<meta charset="utf-8">
+	<title>D3 Test</title>
+	<script type="text/javascript" src="d3/d3.js"></script>
+	<style type="text/css">
+		body {
+  			font: 10px sans-serif;
+		}
+
+		.axis path,
+		.axis line {
+  			fill: none;
+  			stroke: #000;
+  			shape-rendering: crispEdges;
+		}
+
+
+		.line {
+  			fill: none;
+  			stroke-width: 1.5px;
+		}
+		
+		div.tooltip {   
+			  position: absolute;           
+			  text-align: center;           
+			  width: 100px;                  
+			  height: 50px;                 
+			  padding: 2px;             
+			  font: 12px sans-serif;        
+			  border: 0px;      
+			  border-radius: 8px;           
+			  pointer-events: none;         
+		}
+
+	</style>
+	</head>
+	<body>
+	<div id="option">
+		<form name="wordSelection">
+			<input type="text" name="inputWord">
+			<input type="button" value="Update" onclick="plotWord()">
+		</form>
+	</div>
+		<script type="text/javascript" src="data/influenza_annotation.js"></script>
+		<script type="text/javascript">
+			var margin = {top: 20, right: 20, bottom: 30, left: 50},
+			width = 960 - margin.left - margin.right,
+			height = 500 - margin.top - margin.bottom;
+			//var color = ['red','blue','green','purple','gold'];
+			var color = d3.scale.category10();
+
+			var dataCsv = "data/WordTraits.csv";
+			var title = "Influenza";
+
+			//import and format data
+			var data=[],word=[],year=[],ydata=[],vals,ymax=[];
+						var annData=[];
+
+			d3.text(dataCsv,function(error,_data) {
+				d3.csv.parseRows(_data,function(row,i) {
+					if (i == 0) {
+						year = row.slice(1,row.length);
+					} else {
+						vals = [];
+						row.slice(1,row.length)
+							.forEach(function(d) {vals.push((+d)*100);});
+							
+						word.push(row[0]);
+						ymax.push(d3.max(vals));
+						ydata.push(vals);
+					}
+				});
+				var formatDate = d3.time.format("%Y");
+				var parseDate = formatDate.parse;
+				for (var i=0,len = year.length;i<len;i++) {
+						year[i] = (parseDate(year[i]));
+					}
+				
+				//set up scales				
+				var x = d3.time.scale()
+					.range([0, year.length-1])
+					.domain(d3.extent(year));
+						
+				var ydomain = new Array(0,d3.max(ymax));
+				var y = d3.scale.linear()
+					.range([height, 0])
+					.domain(ydomain);	
+					
+			//import and format annotations
+			//add values for each annotation location
+			annotate.forEach(function(d,i) {
+				for (var j=0,len=d.length;j<len;j++) {
+					d[j].value = ydata[i][d3.round(x(parseDate(d[j].year)))]
+					d[j].color = d3.rgb(color(i%10));
+					annData.push(d[j]);
+				}
+				});
+				
+				x.range([0,width]);
+			
+				var xAxis = d3.svg.axis()
+					.scale(x)
+					.orient("bottom");
+
+				var yAxis = d3.svg.axis()
+					.scale(y)
+					.orient("left");
+
+				var line = d3.svg.line()
+					.interpolate("cardinal")
+					.x(function(d, i) { return x(year[i]); })
+					.y(y);
+										
+				var div = d3.select("body").append("div")   
+    				.attr("class", "tooltip")               
+    				.style("opacity", 0);
+					
+				var svg = d3.select("body").append("svg")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+				  .append("g")
+					.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+							
+				svg.selectAll(".line")
+					.data(ydata)
+					.enter().append("path")
+					.attr("class", "line")
+					.attr("d", line)
+					.attr("stroke",function(d,i) {return d3.rgb(color(i%10));})
+				
+				svg.selectAll(".circle")
+					.data(annData)
+					.enter()
+					.append("circle")
+					.attr('r',5)
+					.attr('cx',function(d){return x(parseDate(d.year));})
+					.attr('cy',function(d){return y(d.value);})
+					.attr('fill',function(d){return d.color;})
+					.attr('stroke','black')
+					.on("mouseover", function(d,i) {      
+						div.transition()        
+							.duration(200)      
+							.style("opacity", .9);
+						div.html(d.year + "<br/>"  + d.text)  
+							.style("left", (d3.event.pageX) + "px")     
+							.style("top", (d3.event.pageY - 28) + "px")
+							.style("background",d.color.brighter(.5));    
+						})                  
+					.on("mouseout", function(d) {       
+						div.transition()        
+							.duration(500)      
+							.style("opacity", 0);   
+					});
+												
+				var legend = svg.append("g")
+					.attr("class","legend")
+					.attr("transform","translate(0,30)")
+					.style("font-size","12px")
+				
+				legend.selectAll('g').data(ydata)
+				  .enter()
+				  .append('g')
+				  .each(function(d, i) {
+					var g = d3.select(this);
+					g.append("rect")
+					  .attr("x", width - 65)
+					  .attr("y", i*25)
+					  .attr("width", 10)
+					  .attr("height", 10)
+					  .style("fill", color(i%10));
+		
+					g.append("text")
+					  .attr("x", width - 50)
+					  .attr("y", i * 25 + 8)
+					  .attr("height",30)
+					  .attr("width",100)
+					  .style("fill", color(i%10))
+					  .text(word[i]);
+					});
+				
+				svg.append("g")
+				  .attr("class", "x axis")
+				  .attr("transform", "translate(0," + height + ")")
+				  .call(xAxis)
+				  .append("text")
+				  .attr('font-size',16)
+				  .attr("dy","1em")
+				  .attr("x",width*.98)
+				  .style("text-anchor","middle")
+				  .text('Year');
+
+			  svg.append("g")
+				  .attr("class", "y axis")
+				  .call(yAxis)
+				.append("text")
+				.attr('font-size',16)
+				  .attr("transform", "rotate(-90)")
+				  .attr("y", 6)
+				  .attr("dy", ".71em")
+				  .style("text-anchor", "end")
+				  .text("Percent of title words");
+				  
+			svg.append("text")
+				.attr("x", (width / 2))             
+				.attr("y", 0)
+				.attr("text-anchor", "middle")  
+				.style("font-size", "16px") 
+				.text(title);				
+
+	});
+		</script>
+	</body>
+</html>
